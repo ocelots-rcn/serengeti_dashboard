@@ -1,0 +1,58 @@
+---
+title: "Serengeti Case Study"
+output: flexdashboard::flex_dashboard
+---
+
+<style>
+.observablehq {
+  margin: 10px;
+}
+</style>
+
+Overview
+=====================================  
+
+::: {.floatting}
+
+```{r out.width='50%', out.extra='style="float:right; padding:10px"'}
+knitr::include_graphics("https://snapshotserengeti.s3.msi.umn.edu/S2/E09/E09_R3/S2_E09_R3_IMAG0229.JPG")
+```
+
+This is an online application designed to let you explore and analyze data from the Snapshot Serengeti research site for your own lab project.
+
+The application uses real data from the Snapshot Serengeti camera trap site. The data you will be analyzing represents nearly 900,000 photos taken over 3 years (2010-2013).
+      
+The application analyzes these data using the R, a powerful, statistical programming language that is one of the most commonly used research tools in biology (and elsewhere!).
+
+Fortunately, you won’t have to do any programming yourself! We have designed a collection of graphing tools that allow you to manipulate and analyze the data without having to modify the underlying code itself.
+
+The different graphing tools are listed on the left-hand menu. Each graph presents and summarizes the data in different ways. It is up to you to decide which graph or set of graphs are best suited to answering your research question. Click one to start your analytical exploration of the Snapshot Serengeti data!
+
+We recommend you have the list of variable descriptions for the Snapshot Serengeti dataset handy when working with these graphs. This will help you decide which variables and graphs will be useful for answering your question.
+              
+:::
+
+Embedded
+=====================================  
+
+Column { data-width=400, style="background-color: #222d32; color: white;" }
+-------------------------------------
+<div id="observablehq-intro-1a517d6c"></div>
+<div id="observablehq-viewof-species-1a517d6c"></div>
+<div id="observablehq-viewof-contVar-1a517d6c"></div>
+
+Column { data-width=600 }
+-------------------------------------
+<div id="observablehq-plot-1a517d6c"></div>
+
+<script type="module">
+import {Runtime, Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
+import define from "https://api.observablehq.com/@eea514dd4c55b7e1/bar-charts-animal-frequency-beteween-categories.js?v=3";
+new Runtime().module(define, name => {
+  if (name === "plot") return new Inspector(document.querySelector("#observablehq-plot-1a517d6c"));
+  if (name === "viewof species") return new Inspector(document.querySelector("#observablehq-viewof-species-1a517d6c"));
+  if (name === "viewof contVar") return new Inspector(document.querySelector("#observablehq-viewof-contVar-1a517d6c"));
+  if (name === "intro") return new Inspector(document.querySelector("#observablehq-intro-1a517d6c"));
+  return ["species_filt","plotData"].includes(name);
+});
+</script>
