@@ -30,6 +30,9 @@
                 case 'annual':
                     content.src = "https://ocelots-rcn.github.io/serengeti_annual_activity/js/";
                     break;
+                case 'spatial':
+                    content.src = "https://ocelots-rcn.github.io/serengeti_co-occurance/js/";
+                    break;
                 default:
                     content.src = "./overview.html";
                     break;
@@ -49,6 +52,7 @@
             <div name="variables" style="height: 25px;padding: 10px;border: 1px solid #1967be;cursor: pointer" onclick="switchTab(this)">Continuous Vars.</div>
             <div name="daily" style="height: 25px;padding: 10px;border: 1px solid #1967be;cursor: pointer" onclick="switchTab(this)">Daily Activity</div>
             <div name="annual" style="height: 25px;padding: 10px;border: 1px solid #1967be;cursor: pointer" onclick="switchTab(this)">Annual Activity</div>
+            <div name="spatial" style="height: 25px;padding: 10px;border: 1px solid #1967be;cursor: pointer" onclick="switchTab(this)">Spatial Distribution</div>
         </div>
     </div>
     <div>
