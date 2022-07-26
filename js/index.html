@@ -21,7 +21,10 @@
                 case 'observations':
                     content.src = "https://ocelots-rcn.github.io/serengeti_data_structure/js/";
                     break;
-                case 'variables':
+                case 'scatter':
+                    content.src = "https://ocelots-rcn.github.io/serengeti_scatter_plot/js/";
+                    break;
+                case 'box':
                     content.src = "https://ocelots-rcn.github.io/serengeti_cont_by_species/js/";
                     break;
                 case 'daily':
@@ -49,7 +52,8 @@
             <div name="exploration" style="height: 25px;padding: 10px;border: 1px solid #1967be;cursor: pointer" onclick="switchTab(this)">Data Preview</div>
             <div name="wildebeest" style="height: 25px;padding: 10px;border: 1px solid #1967be;cursor: pointer" onclick="switchTab(this)">Wildebeest Obs.</div>
             <div name="observations" style="height: 25px;padding: 10px;border: 1px solid #1967be;cursor: pointer" onclick="switchTab(this)">Obs. Frequency</div>
-            <div name="variables" style="height: 25px;padding: 10px;border: 1px solid #1967be;cursor: pointer" onclick="switchTab(this)">Continuous Vars.</div>
+            <div name="scatter" style="height: 25px;padding: 10px;border: 1px solid #1967be;cursor: pointer" onclick="switchTab(this)">Scatter Plots</div>
+            <div name="box" style="height: 25px;padding: 10px;border: 1px solid #1967be;cursor: pointer" onclick="switchTab(this)">Box Plots</div>
             <div name="daily" style="height: 25px;padding: 10px;border: 1px solid #1967be;cursor: pointer" onclick="switchTab(this)">Daily Activity</div>
             <div name="annual" style="height: 25px;padding: 10px;border: 1px solid #1967be;cursor: pointer" onclick="switchTab(this)">Annual Activity</div>
             <div name="spatial" style="height: 25px;padding: 10px;border: 1px solid #1967be;cursor: pointer" onclick="switchTab(this)">Spatial Distribution</div>
