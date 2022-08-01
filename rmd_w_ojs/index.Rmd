@@ -1,18 +1,24 @@
 ---
 title: "Serengeti Case Study"
-output: flexdashboard::flex_dashboard
+output: 
+  flexdashboard::flex_dashboard:
+    theme: 
+      version: 4
+      bootswatch: sandstone
 ---
 
 <style>
-.observablehq {
-  margin: 10px;
+._observablehq {
+  padding: 10px;
+  background-color: #222d32; 
+  color: white;
 }
 </style>
 
 Overview
 =====================================  
 
-::: {.floatting}
+::: {.floating}
 
 ```{r out.width='50%', out.extra='style="float:right; padding:10px"'}
 knitr::include_graphics("https://snapshotserengeti.s3.msi.umn.edu/S2/E09/E09_R3/S2_E09_R3_IMAG0229.JPG")
@@ -32,27 +38,57 @@ We recommend you have the list of variable descriptions for the Snapshot Serenge
               
 :::
 
-Embedded
+Bar Chart Plot
 =====================================  
 
-Column { data-width=400, style="background-color: #222d32; color: white;" }
+Inputs { .sidebar data-width=400 }
 -------------------------------------
-<div id="observablehq-intro-1a517d6c"></div>
-<div id="observablehq-viewof-species-1a517d6c"></div>
-<div id="observablehq-viewof-contVar-1a517d6c"></div>
+
+<h1>Bar Charts - animal frequency between categories</h1>
+
+The bar chart graph is useful for comparing animal frequency between categories of a categorical or binary variable.
+
+The X-axis consists of categories for the given variable. The Y-axis is the frequency of photos taken of a given species in each category. The Y-axis can be changed to absolute frequency (# of photos) or relative frequency (fraction of photos in each category).
+
+You can use the filters to narrow down what photos you are interested in. You can also select multiple species to compare. The data for each species will be represented by a different color.
 
 Column { data-width=600 }
 -------------------------------------
-<div id="observablehq-plot-1a517d6c"></div>
+
+### Plot { data-height=600 }
+
+<div id="observablehq-barchartplot-ff46917c"></div>
+
+### Data { data-height=400 }
+
+Histograms
+=====================================  
+
+Inputs { .sidebar data-width=400 }
+-------------------------------------
+
+<h1>Histograms - animal frequency between continuous variables</h1>
+
+The histogram graph is useful for comparing animal frequency across the range of a continuous variable.
+
+The X-axis is the continuous variable divided into equally sized bins. The Y-axis is the frequency of photos taken of a given species within each bin. The Y-axis can be changed to absolute frequency (# of photos) or relative frequency (fraction of photos in each category).
+
+You can use the filters to narrow down what photos you are interested in. You can also select multiple species to compare. The data for each species will be represented by a different color.
+
+Column { data-width=600 }
+-------------------------------------
+
+### Plot { data-height=600 }
+
+<div id="observablehq-histogram-ff46917c"></div>
+
+### Data { data-height=400 }
 
 <script type="module">
 import {Runtime, Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
-import define from "https://api.observablehq.com/@eea514dd4c55b7e1/bar-charts-animal-frequency-beteween-categories.js?v=3";
+import define from "https://api.observablehq.com/@eea514dd4c55b7e1/serengeti-dashboard.js?v=3";
 new Runtime().module(define, name => {
-  if (name === "plot") return new Inspector(document.querySelector("#observablehq-plot-1a517d6c"));
-  if (name === "viewof species") return new Inspector(document.querySelector("#observablehq-viewof-species-1a517d6c"));
-  if (name === "viewof contVar") return new Inspector(document.querySelector("#observablehq-viewof-contVar-1a517d6c"));
-  if (name === "intro") return new Inspector(document.querySelector("#observablehq-intro-1a517d6c"));
-  return ["species_filt","plotData"].includes(name);
+  if (name === "barchartplot") return new Inspector(document.querySelector("#section-observablehq-barchartplot-ff46917c"));
+  if (name === "histogram") return new Inspector(document.querySelector("#section-observablehq-histogram-ff46917c"));
 });
 </script>
