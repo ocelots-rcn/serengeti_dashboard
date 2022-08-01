@@ -1,0 +1,32 @@
+<script>
+// https://eager.io/blog/how-to-decide-when-your-code-should-run/
+var observer = new MutationObserver(function(mutations){
+  mutations.forEach(function(mutation) {
+    mutation.addedNodes.forEach(node => {
+      // We're iterating through _all_ the elements as the parser parses them,
+      // deciding if they're the one we're looking for.
+      if ((typeof node.matches === 'function') && node.matches('#DataTables_Table_0')) {
+        $('#DataTables_Table_0').magnificPopup({
+	        type:'image',
+	        closeOnContentClick: false,
+	        closeBtnInside: false,
+	        delegate: '.image-lb',
+	        gallery: { enabled: false },
+	        image: {
+	          verticalFit: true,
+		        titleSrc: 'alt'
+	        }
+    	  });
+
+        // We found our element, we're done:
+        observer.disconnect();
+      };
+    });
+  });
+});
+
+observer.observe(document.documentElement, {
+  childList: true,
+  subtree: true
+});
+</script>

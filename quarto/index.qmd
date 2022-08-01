@@ -1,0 +1,390 @@
+---
+title: Serengeti Case Study
+format: 
+  html:
+    include-before-body: 
+      - includes/magnific_popup.html
+      - includes/magnific_attach.html
+    css: includes/magnific-popup.css
+    theme: cosmo
+    page-layout: custom
+---
+
+<style>
+body {
+  margin: 10px;
+}
+
+.wrapping {
+  float: right;
+  shape-outside: url("https://snapshotserengeti.s3.msi.umn.edu/S2/E09/E09_R3/S2_E09_R3_IMAG0229.JPG");
+  shape-margin: 50px;
+  width: 50%;
+}
+
+#fig-structure > figure > figcaption {
+  float: left;
+  clear: both;
+}
+</style>
+
+```{r load-r-packages, message=F, echo=F, warning=F}
+library(here)
+library(dplyr)
+library(lubridate)
+library(readr)
+library(DT)
+library(leaflet)
+```
+
+```{r load-serengeti-data, message=F, echo=F, warning=F}
+serengeti <- read_csv(here::here("data", "S1-11_filtered.csv")) %>%
+  select(-X1) %>%
+  mutate(
+    Date = mdy(Date),
+    Species = as.factor(Species),
+    `Camera Site` = as.factor(`Camera Site`),
+    Habitat = as.factor(Habitat),
+    `Month (1=Jan)` = as.integer(`Month (1=Jan.)`),
+    `Number Of Animals` = as.integer(`Number Of Animals`),
+    Standing = as.integer(Standing),
+    Moving = as.integer(Moving),
+    Eating = as.integer(Eating),
+    Babies = as.integer(Babies),
+    `Longitude (m)` = as.integer(`Longitude (m)`),
+    `Latitude (m)` = as.integer(`Latitude (m)`)
+  )
+
+ojs_define(serengeti)
+```
+
+```{r load-preview-data, message=F, echo=F, warning=F}
+url_suffix <- read_csv(here::here("data", "url_suffix.csv"))
+serengeti_200 <- read_csv(here::here("data", "Serengeti_Data_200_lines_modified.csv")) %>%
+  full_join(url_suffix, serengeti_200, by = "CaptureEventID") %>%
+  mutate(img = paste0('<img src="https://snapshotserengeti.s3.msi.umn.edu/', suffix, '" height="52" class="image-lb" data-mfp-src="https://snapshotserengeti.s3.msi.umn.edu/', suffix, '"></img>')) %>%
+  relocate(img, .before = CaptureEventID) %>%
+  select(-X1, -suffix) %>%
+  mutate(
+    Date = mdy(Date),
+    Species = as.factor(Species),
+    `Camera Site` = as.factor(`Camera Site`),
+    Habitat = as.factor(Habitat),
+    `Month (1=Jan)` = as.integer(`Month (1=Jan)`),
+    `Number Of Animals` = as.integer(`Number Of Animals`),
+    Standing = as.integer(Standing),
+    Moving = as.integer(Moving),
+    Eating = as.integer(Eating),
+    Babies = as.integer(Babies),
+    `Longitude (m)` = as.integer(`Longitude (m)`),
+    `Latitude (m)` = as.integer(`Latitude (m)`)
+  )
+
+ojs_define(serengeti_200)
+```
+
+```{r load-input-settings, message=F, echo=F, warning=F}
+
+species_prey <- c("buffalo","bushbuck","dikDik","eland","elephant","gazelleGrants", "gazelleThomsons","giraffe","hartebeest","hippopotamus","impala", "reedbuck", "rhinoceros", "topi", "warthog", "wildebeest","zebra")
+species_predators <- c("aardwolf","batEaredFox","caracal","civet","genet","jackal","hyenaSpotted","hyenaStriped","wildcat","serval","cheetah","leopard","lionMale","lionFemale")
+species_other <-c("aardvark","baboon","guineaFowl","hare","honeyBadger","human","koriBustard","mongoose","ostrich","otherBird","porcupine","reptiles","rodents","secretaryBird")
+species_all <- unique(serengeti$Species)
+
+ojs_define(species_prey, species_predators, species_other, species_all)
+```
+
+```{ojs load-ojs-modules}
+//| echo: false
+import {aq, op} from "@uwdata/arquero" // JavaScript dplyr
+import {vl} from "@vega/vega-lite-api-v5" // JavaScript ggplot2
+
+// Inputs
+import {multiAutoSelect} from "@mdlama/multi-auto-select"
+
+// Loading
+import {loading} from "@mateh/loading"
+```
+
+```{ojs load-proj4}
+//| echo: false
+proj4 = require('proj4@2.8.0/dist/proj4-src.js')
+```
+
+```{ojs load-leaflet}
+//| echo: false
+// https://observablehq.com/@observablehq/hello-leaflet
+L = {
+  const L = await require("leaflet@1/dist/leaflet.js");
+  if (!L._style) {
+    const href = await require.resolve("leaflet@1/dist/leaflet.css");
+    document.head.appendChild(L._style = html`<link href=${href} rel=stylesheet>`);
+  }
+  return L;
+}
+```
+
+```{ojs create-spinner-function}
+//| echo: false
+spinner = (height = 400) => html`
+<div style="display: flex; justify-content: center; align-items: center; max-width: 640px; height: ${height}px;">
+${loading({
+  style: "color: #3b5fc0",
+  size: 160
+})}
+</div>
+`;
+```
+
+::: { .panel-tabset }
+
+## Overview
+
+::: { .wrapping }
+![](https://snapshotserengeti.s3.msi.umn.edu/S2/E09/E09_R3/S2_E09_R3_IMAG0229.JPG)
+:::
+
+This is an online application designed to let you explore and analyze data from the Snapshot Serengeti research site for your own lab project.
+
+The application uses real data from the Snapshot Serengeti camera trap site. The data you will be analyzing represents nearly 900,000 photos taken over 3 years (2010-2013).
+      
+The application analyzes these data using the R, a powerful, statistical programming language that is one of the most commonly used research tools in biology (and elsewhere!).
+
+Fortunately, you won’t have to do any programming yourself! We have designed a collection of graphing tools that allow you to manipulate and analyze the data without having to modify the underlying code itself.
+
+The different graphing tools are listed on the left-hand menu. Each graph presents and summarizes the data in different ways. It is up to you to decide which graph or set of graphs are best suited to answering your research question. Click one to start your analytical exploration of the Snapshot Serengeti data!
+
+We recommend you have the list of variable descriptions for the Snapshot Serengeti dataset handy when working with these graphs. This will help you decide which variables and graphs will be useful for answering your question.
+
+## Data Preview
+
+```{r datatable, message=F, echo=F, warning=F}
+datatable(serengeti_200, 
+          filter = "top", 
+          escape = FALSE,
+          options = list(
+            pageLength = 5
+          )
+)
+```
+
+## Wildebeest Obs.
+
+::: { .panel-sidebar }
+
+::: { .panel-tabset }
+
+## Overview
+
+### Environment at Sites of Wildebeest Observation, by Season
+
+Environmental values at cameras where wildebeest were recorded by month. Boxes show the interquartile range, horizontal line is the median, diamond is the mean value. Whiskers show the values of points included within 1.5 times the intnerquartile range, values outside of this range (outliers) are represented by open circles.
+
+## Filters
+
+```{ojs wildebeest-inputs}
+//| echo: false
+viewof inputs_wov = Inputs.radio(
+  ["Amount of Shade", 
+   "Distance to Confluence (m)",
+   "Distance to Kopje (m)",
+   "Distance to River (m)",
+   "Seasonal Greenness"],
+  { 
+    value: "Amount of Shade",
+    label: "Variable"
+  }
+)
+```
+
+```{ojs wildebeest-filter}
+//| echo: false
+filtered_wov = aq.table(serengeti)
+  .filter(aq.escape(r => r.Species == 'wildebeest'))
+```
+
+:::
+
+:::
+
+```{ojs wildebeest-plot}
+//| echo: false
+//| panel: fill
+{
+  yield spinner();
+  yield vl.markBoxplot({size: 30})
+  .data(filtered_wov)
+  .encode(
+    vl.x().fieldN('Month (1=Jan)'),
+    vl.y().fieldQ(inputs_wov),
+    vl.color().fieldN('Month (1=Jan)').legend(null)
+  )
+  .width(600)
+  .height(400)
+  .render();
+}
+```
+
+## Obs. Frequency
+
+::: { .panel-sidebar }
+
+::: { .panel-tabset }
+
+## Overview
+
+### Observations
+
+The following graphs and map will allow you to explore the overall observation frequency of each species.
+
+## Filters
+
+```{ojs frequency-buttons}
+//| echo: false
+input = await viewof species_freq;
+
+Inputs.button([
+  ["Predators", () => input.update(species_predators)],
+  ["Prey", () => input.update(species_prey)],
+  ["Other", () => input.update(species_other)],
+  ["All Species", () => input.update(species_all)],
+  ["Clear Species", () => input.update([])]
+])
+
+viewof species_freq = multiAutoSelect({
+  options: species_all,
+  value: species_all,
+  placeholder: "Select Values"
+})
+```
+
+```{ojs frequency-observations}
+//| echo: false
+frequency_observations = {
+  const fromproj = '+proj=utm +zone=36 +south +a=6378249.145 +rf=293.465 +units=m +no_defs';
+  const toproj = '+proj=longlat +datum=WGS84 +no_defs';
+  
+  const frequency_observations = aq.table(serengeti)
+    .filter(aq.escape(r => !isNaN(r['Latitude (m)']) && !isNaN(r['Longitude (m)'])))
+    .derive({
+      latlon: aq.escape(r => proj4(fromproj, toproj, [+r['Longitude (m)'], +r['Latitude (m)']]))
+    });
+    
+  return frequency_observations;
+}
+```
+
+```{ojs frequency-filter}
+//| echo: false
+frequency_filter = frequency_observations
+  .filter(aq.escape(r => op.includes(species_freq, r.Species)))
+```
+
+:::
+
+:::
+
+::: { .panel-fill }
+
+::: { .panel-tabset }
+
+## Observation by Species
+
+```{ojs frequency-plot-by-species}
+//| echo: false
+{
+  yield spinner();
+  yield vl.markBar({ tooltip: true })
+    .data(frequency_filter)
+    .transform(
+      vl.aggregate({op: "count", as: "Freq"}).groupby("Species")
+    )
+    .encode(
+      vl.x().fieldN('Species'),
+      vl.y().fieldQ('Freq')
+    )
+  .width(900)
+  .height(400)
+  .render()
+}
+```
+
+## Observation by Camera
+
+```{ojs frequency-plot-by-camera}
+//| echo: false
+{
+  yield spinner();
+  yield vl.markBar({ tooltip: true })
+    .data(frequency_filter)
+    .transform(
+      vl.aggregate({op: "count", as: "Freq"}).groupby("Camera Site")
+    )
+    .encode(
+      vl.x().fieldN('Camera Site'),
+      vl.y().fieldQ('Freq')
+    )
+  .width(900)
+  .height(400)
+  .render()
+}
+```
+
+## Observation by Location
+
+```{ojs frequency-map-plot}
+//| echo: false
+container = html`<div style="height:600px;">`;
+```
+
+```{ojs frequency-layer}
+//| echo: false
+obsLayer = {
+  const map = L.map(container).setView([-2.5, 34.9], 11);
+  L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    subdomains:['mt0','mt1','mt2','mt3']
+  }).addTo(map);
+  
+  const obsLayer = L.layerGroup();
+  obsLayer.addTo(map);
+  
+  setInterval(function() { map.invalidateSize(); }, 100);
+  
+  yield obsLayer;
+}
+```
+
+```{ojs frequency-layer-data}
+//| echo: false
+markers = frequency_filter
+  .groupby('Camera Site')
+  .rollup({'Image Count': op.count(), 
+           latlon: op.array_agg_distinct('latlon')
+   })
+  .derive({latlon: r => r.latlon[0],
+           radius: r => 1500*r['Image Count']/op.max(r['Image Count'])})
+  .filter(aq.escape(r => r['Image Count'] > 0))
+  .derive({marker: aq.escape(d => L.circle([d.latlon[1], d.latlon[0]], {radius: d.radius, color: 'red', weight: 2})
+                                   .bindPopup(`Camera Site: ${d['Camera Site']}<br/><br/>Image Count: ${d['Image Count']} `, {
+                                      closeButton: true
+                                    })
+                            )
+         })
+```
+
+```{ojs}
+//| echo: false
+//| output: false
+{
+  obsLayer.clearLayers();
+  for (const marker of markers.array('marker')) {
+    obsLayer.addLayer(marker);
+  }
+}
+```
+
+:::
+
+:::
+
+:::
