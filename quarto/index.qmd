@@ -320,7 +320,7 @@ frequency_filter = frequency_observations
       vl.aggregate({op: "count", as: "Freq"}).groupby("Camera Site")
     )
     .encode(
-      vl.x().fieldN('Camera Site'),
+      vl.x().fieldN('Camera Site').axis({labelOverlap: true}),
       vl.y().fieldQ('Freq')
     )
   .width(900)
